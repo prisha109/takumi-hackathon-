@@ -1,4 +1,4 @@
 # takumi-hackathon-
-Author-Prisha Sharma
+Prisha Sharma
 <br>
 using github 

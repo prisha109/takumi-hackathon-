@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebOS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Exo 2',sans-serif;user-select:none;}
+
+/* backgrounf details by gradient */
+body{
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(56,14,99,.55) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(10,50,120,.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 85%, rgba(5,90,80,.4) 0%, transparent 45%),
+    linear-gradient(135deg,#07071a 0%,#0d1230 40%,#0a1e18 100%);
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%,rgba(255,255,255,.8) 0%,transparent 100%),
+    radial-gradient(1px 1px at 34% 72%,rgba(255,255,255,.6) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 55% 9%,rgba(255,255,255,.9) 0%,transparent 100%),
+    radial-gradient(1px 1px at 74% 55%,rgba(255,255,255,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 88% 31%,rgba(255,255,255,.7) 0%,transparent 100%),
+    radial-gradient(1px 1px at 6% 83%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 40%,rgba(200,210,255,.6) 0%,transparent 100%),
+    radial-gradient(1px 1px at 92% 78%,rgba(255,255,255,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 28% 95%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 66% 62%,rgba(255,255,255,.6) 0%,transparent 100%),
+    radial-gradient(1px 1px at 18% 48%,rgba(200,220,255,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 80% 88%,rgba(255,255,255,.5) 0%,transparent 100%);
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 50% 50%,rgba(80,40,140,.12) 0%,transparent 70%);
+}
+
+/*clock*/
+#clock-widget{position:fixed;top:28px;left:40px;cursor:grab;z-index:50;}
+#clock-widget:active{cursor:grabbing;}
+#screen-time{font-family:'Share Tech Mono',monospace;font-size:3.8rem;color:#fff;line-height:1;text-shadow:0 2px 18px rgba(0,0,0,.7);}
+#screen-date{font-family:'Share Tech Mono',monospace;font-size:.85rem;margin-top:5px;}
+
+/*icons below time*/
+.desk-item{position:fixed;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:grab;z-index:60;padding:8px;border-radius:16px;transition:background .15s;}
+.desk-item:active{cursor:grabbing;}
+.desk-item:hover{background:rgba(255,255,255,.08);}
+.desk-icon{font-size:2.4rem;line-height:1;filter:drop-shadow(0 3px 8px rgba(0,0,0,.55));transition:transform .15s,filter .15s;display:flex;align-items:center;justify-content:center;width:52px;height:52px;}
+.desk-item:hover .desk-icon{transform:translateY(-6px) scale(1.12);filter:drop-shadow(0 8px 16px rgba(0,0,0,.65));}
+.desk-label{font-size:.6rem;color:rgba(255,255,255,.9);letter-spacing:.04em;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.8);background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px;backdrop-filter:blur(4px);white-space:nowrap;}
+
+/*windows taskbar*/
+#taskbar{position:fixed;bottom:0;left:0;right:0;height:52px;background:rgba(0,0,0,.55);backdrop-filter:blur(22px);border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;padding:0 14px;gap:6px;z-index:9999;}
+#tb-winlogo{font-size:1.4rem;padding:5px 9px;cursor:pointer;border-radius:7px;color:#fff;transition:background .15s;display:flex;align-items:center;}
+#tb-winlogo:hover{background:rgba(255,255,255,.12);}
+.tb-sep{width:1px;height:28px;background:rgba(255,255,255,.15);margin:0 6px;}
+.tb-fixed-btn{width:38px;height:38px;border-radius:8px;border:none;background:transparent;color:#fff;font-size:1.2rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.tb-fixed-btn:hover{background:rgba(255,255,255,.12);}
+.tb-divider{width:1px;height:28px;background:rgba(255,255,255,.1);margin:0 4px;}
+.task-chip{font-size:.68rem;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);cursor:pointer;display:none;transition:background .12s;white-space:nowrap;}
+.task-chip.open{display:inline-flex;align-items:center;gap:5px;}
+.task-chip:hover{background:rgba(255,255,255,.28);}
+#taskbar-clock{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:rgba(255,255,255,.85);margin-left:auto;text-align:right;line-height:1.5;}
+
+
+.window{position:fixed;border-radius:12px;box-shadow:0 24px 60px rgba(0,0,0,.65);display:none;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,.18);}
+.window.open{display:flex;}
+.titlebar{height:36px;min-height:36px;background:rgba(30,30,40,.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;padding:0 10px;gap:8px;cursor:grab;flex-shrink:0;}
+.titlebar:active{cursor:grabbing;}
+
+/*close button*/
+.tb-close{
+  width:18px;height:18px;border-radius:4px;
+  border:1px solid rgba(255,80,70,.55);
+  background:rgba(255,80,70,.15);
+  cursor:pointer;padding:0;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,border-color .15s;
+  position:relative;
+}
+.tb-close:hover{background:rgba(255,80,70,.5);border-color:rgba(255,80,70,.9);}
+.tb-close::before,.tb-close::after{content:'';position:absolute;width:9px;height:1.5px;background:rgba(255,190,185,.9);border-radius:1px;}
+.tb-close::before{transform:rotate(45deg);}
+.tb-close::after{transform:rotate(-45deg);}
+
+.tb-title{flex:1;font-size:.72rem;font-weight:600;color:rgba(255,255,255,.6);letter-spacing:.12em;text-align:center;pointer-events:none;text-transform:uppercase;}
+.win-body{flex:1;overflow:hidden;display:flex;}
+
+/* ── SCRATCHPAD ── */
+#win-scratch{width:560px;height:460px;top:90px;left:180px;z-index:100;}
+.sp-body{flex:1;position:relative;background:rgb(179,179,179);display:flex;align-items:center;justify-content:center;}
+#sp-canvas{border:10px solid white;background:white;border-radius:8%;cursor:crosshair;display:block;}
+.sp-btn{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;position:absolute;box-shadow:0 4px 10px rgba(0,0,0,.3);transition:box-shadow .15s;}
+.sp-btn:hover{box-shadow:0 6px 15px rgba(0,0,0,.45);}
+#sp-dark{background:#0B1957;top:20%;left:8px;}
+#sp-blue{background:#5784E6;top:36%;left:8px;}
+#sp-pink{background:#FA9EBC;top:52%;left:8px;}
+#sp-eraser{background:white;top:68%;left:8px;}
+
+/*calc*/
+#win-calc{width:290px;height:380px;top:100px;left:420px;z-index:100;}
+.calc-body{flex:1;display:flex;flex-direction:column;background:#2c2c2c;padding:14px;gap:10px;}
+#calc-screen{width:100%;height:50px;border:none;outline:none;font-size:22px;padding:8px 10px;text-align:right;border-radius:8px;background:#f3f3f3;flex-shrink:0;}
+.calc-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1;}
+.calc-btns button{border:none;border-radius:8px;font-size:16px;cursor:pointer;background:#444;color:white;transition:background .15s;}
+.calc-btns button:hover{background:#5a5a5a;}
+.calc-btns .eq{background:#ff9500;}.calc-btns .eq:hover{background:#ffad33;}
+.calc-btns .clr{background:#d9534f;grid-column:span 4;}.calc-btns .clr:hover{background:#c0392b;}
+
+/*calendar*/
+#win-cal{width:560px;height:440px;top:80px;left:220px;z-index:100;}
+.cal-body{flex:1;display:flex;flex-direction:column;background:#fff;overflow:hidden;}
+.cal-top{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #ddd;}
+.cal-title-txt{font-size:17px;color:#1a73e8;font-weight:700;}
+.cal-month-txt{font-size:15px;color:#333;margin-left:4px;}
+.cal-spacer{flex:1;}
+.cal-btn{border:none;background:#eee;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem;}
+.cal-btn:hover{background:#ddd;}
+.cal-days,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-days div{padding:8px;text-align:center;font-weight:700;border-bottom:1px solid #ddd;color:#666;font-size:.76rem;}
+.cal-cell{height:70px;border-right:1px solid #eee;border-bottom:1px solid #eee;padding:6px;}
+.cal-num{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:.8rem;}
+.cal-today{background:#1a73e8;color:#fff;}
+.cal-dim{color:#bbb;}
+
+/*notepad */
+#win-note{width:480px;height:360px;top:110px;left:260px;z-index:100;}
+.note-body{flex:1;display:flex;flex-direction:column;}
+#note-filename-bar{padding:5px 12px;background:rgba(20,22,35,.9);border-bottom:1px solid rgba(255,255,255,.08);font-family:'Share Tech Mono',monospace;font-size:.72rem;color:rgba(160,180,220,.7);letter-spacing:.05em;flex-shrink:0;}
+#note-area{flex:1;resize:none;border:none;outline:none;background:#1e2330;color:#c8d3f0;font-family:'Share Tech Mono',monospace;font-size:.85rem;padding:14px;line-height:1.6;}
+#note-area::placeholder{color:rgba(200,220,255,.2);}
+
+/* web browser */
+#win-browser{width:700px;height:540px;top:80px;left:160px;z-index:100;}
+.browser-body{flex:1;display:flex;flex-direction:column;background:#f9fbfd;overflow:hidden;}
+#browser-search-bar{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid #ddeef9;background:#f4f9fd;flex-shrink:0;}
+#browser-input{flex:1;height:32px;padding:0 12px;border:1px solid #c9dff0;border-radius:8px;font-size:13px;outline:none;background:#fff;color:#3a5068;font-family:'Exo 2',sans-serif;}
+#browser-input::placeholder{color:#aac4d8;}
+#browser-input:focus{border-color:#90bedd;}
+#browser-go{height:32px;padding:0 16px;border:1px solid #b8d8ee;border-radius:8px;background:#d6edf9;color:#3a6a8a;font-size:13px;cursor:pointer;font-family:'Exo 2',sans-serif;transition:background .15s;}
+#browser-go:hover{background:#bcd9ef;}
+#browser-hint{flex:1;display:flex;align-items:center;justify-content:center;color:#aac4d8;font-size:14px;background:#f9fbfd;}
+#browser-iframe-wrap{display:none;flex:1;}
+#browser-iframe{width:100%;height:100%;border:none;display:block;}
+#win-browser .resize-h{position:absolute;bottom:0;right:0;width:16px;height:16px;cursor:se-resize;}
+#win-browser .resize-h::after{content:'';position:absolute;bottom:4px;right:4px;width:8px;height:8px;border-right:2px solid #b8d8ee;border-bottom:2px solid #b8d8ee;}
+
+/* file explorer*/
+#win-files{width:640px;height:480px;top:90px;left:200px;z-index:100;}
+.fe-body{flex:1;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(160deg,#14162a 0%,#0f1928 60%,#101e1a 100%);}
+.fe-toolbar{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;background:rgba(255,255,255,.03);}
+.fe-path{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:rgba(140,170,220,.7);letter-spacing:.04em;}
+.fe-grid{flex:1;padding:18px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:14px;overflow-y:auto;}
+.fe-grid::-webkit-scrollbar{width:5px;}
+.fe-grid::-webkit-scrollbar-track{background:transparent;}
+.fe-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
+.fe-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 6px;border-radius:10px;cursor:pointer;transition:background .12s;width:72px;}
+.fe-item:hover{background:rgba(255,255,255,.08);}
+.fe-item.selected{background:rgba(100,160,255,.18);}
+.fe-item-icon{font-size:2rem;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));}
+.fe-item-name{font-size:.6rem;color:rgba(200,215,255,.85);text-align:center;word-break:break-all;line-height:1.3;max-width:68px;font-family:'Exo 2',sans-serif;}
+.fe-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(140,160,200,.35);font-size:.8rem;gap:8px;letter-spacing:.06em;}
+.fe-empty-icon{font-size:2.5rem;opacity:.3;}
+.fe-rename{width:64px;font-size:.6rem;text-align:center;background:rgba(255,255,255,.12);border:1px solid rgba(100,160,255,.45);border-radius:3px;color:#fff;outline:none;padding:2px 3px;font-family:'Exo 2',sans-serif;margin-top:0;}
+
+#ctx-menu{position:fixed;display:none;background:rgba(18,20,36,.97);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.11);border-radius:10px;padding:5px 0;min-width:174px;z-index:99999;box-shadow:0 14px 40px rgba(0,0,0,.65);}
+#ctx-menu.open{display:block;}
+.ctx-item{padding:8px 16px;font-size:.78rem;color:rgba(220,230,255,.85);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .1s;letter-spacing:.02em;}
+.ctx-item:hover{background:rgba(255,255,255,.09);}
+.ctx-sep{height:1px;background:rgba(255,255,255,.07);margin:4px 0;}
+.ctx-icon{font-size:1rem;width:18px;text-align:center;}
+</style>
+</head>
+<body>
+
+<!-- CLOCK -->
+<div id="clock-widget">
+  <div id="screen-time"></div>
+  <div id="screen-date">
+    <span class="badge bg-light bg-opacity-25 text-white fw-normal" id="screen-date-badge"
+      style="font-family:'Share Tech Mono',monospace;font-size:.8rem;letter-spacing:.1em;"></span>
+  </div>
+</div>
+
+<!--iocns-->
+<div class="desk-item" id="icon-calc"    style="top:170px;left:40px;"  onclick="openWin('win-calc')">
+  <div class="desk-icon">🧮</div><span class="desk-label">Calculator</span>
+</div>
+<div class="desk-item" id="icon-cal"     style="top:170px;left:108px;" onclick="openWin('win-cal')">
+  <div class="desk-icon">📅</div><span class="desk-label">Calendar</span>
+</div>
+<div class="desk-item" id="icon-browser" style="top:170px;left:176px;" onclick="openWin('win-browser')">
+  <div class="desk-icon">🌐</div><span class="desk-label">Browser</span>
+</div>
+<div class="desk-item" id="icon-files"   style="top:170px;left:244px;" onclick="openWin('win-files')">
+  <div class="desk-icon">📁</div><span class="desk-label">Files</span>
+</div>
+<div class="desk-item" id="icon-scratch" style="top:170px;left:312px;" onclick="openWin('win-scratch')">
+  <div class="desk-icon">✏️</div><span class="desk-label">Scratchpad</span>
+</div>
+<div class="desk-item" id="icon-note"    style="top:170px;left:380px;" onclick="openWin('win-note')">
+  <div class="desk-icon">📝</div><span class="desk-label">Notepad</span>
+</div>
+
+<!--taskbra-->>
+<div id="taskbar">
+  <div id="tb-winlogo">⊞</div>
+  <div class="tb-sep"></div>
+  <button class="tb-fixed-btn" title="File Explorer" onclick="openWin('win-files')">📁</button>
+  <button class="tb-fixed-btn" title="Browser"       onclick="openWin('win-browser')">🌐</button>
+  <div class="tb-divider"></div>
+  <button class="task-chip" id="chip-win-scratch" onclick="openWin('win-scratch')">✏️ Scratchpad</button>
+  <button class="task-chip" id="chip-win-calc"    onclick="openWin('win-calc')">🧮 Calculator</button>
+  <button class="task-chip" id="chip-win-cal"     onclick="openWin('win-cal')">📅 Calendar</button>
+  <button class="task-chip" id="chip-win-note"    onclick="openWin('win-note')">📝 Notepad</button>
+  <button class="task-chip" id="chip-win-browser" onclick="openWin('win-browser')">🌐 Browser</button>
+  <button class="task-chip" id="chip-win-files"   onclick="openWin('win-files')">📁 Files</button>
+  <div id="taskbar-clock"></div>
+</div>
+
+<!-- khujao-->
+<div class="window" id="win-scratch">
+  <div class="titlebar">
+    <button class="tb-close" onclick="closeWin('win-scratch')"></button>
+    <span class="tb-title">Scratchpad</span>
+  </div>
+  <div class="win-body">
+    <div class="sp-body">
+      <canvas id="sp-canvas" width="400" height="370"></canvas>
+      <button class="sp-btn" id="sp-dark"></button>
+      <button class="sp-btn" id="sp-blue"></button>
+      <button class="sp-btn" id="sp-pink"></button>
+      <button class="sp-btn" id="sp-eraser"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ganit -->
+<div class="window" id="win-calc">
+  <div class="titlebar">
+    <button class="tb-close" onclick="closeWin('win-calc')"></button>
+    <span class="tb-title">Calculator</span>
+  </div>
+  <div class="win-body">
+    <div class="calc-body">
+      <input type="text" id="calc-screen" readonly>
+      <div class="calc-btns">
+        <button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button>
+        <button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')">/</button>
+        <button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button>
+        <button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')">×</button>
+        <button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button>
+        <button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')">−</button>
+        <button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button>
+        <button class="eq" onclick="calcSolve()">=</button><button onclick="calcAdd('+')">+</button>
+        <button class="clr" onclick="calcClear()">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- clendar-->
+<div class="window" id="win-cal">
+  <div class="titlebar">
+    <button class="tb-close" onclick="closeWin('win-cal')"></button>
+    <span class="tb-title">Calendar</span>
+  </div>
+  <div class="win-body">
+    <div class="cal-body">
+      <div class="cal-top">
+        <span class="cal-title-txt">Calendar</span>
+        <button class="cal-btn" onclick="calChange(-1)">◀</button>
+        <button class="cal-btn" onclick="calChange(1)">▶</button>
+        <span class="cal-month-txt" id="cal-month"></span>
+        <div class="cal-spacer"></div>
+        <button class="cal-btn" onclick="calToday()">Today</button>
+      </div>
+      <div class="cal-days">
+        <div>Sun</div><div>Mon</div><div>Tue</div>
+        <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- notepd -->
+<div class="window" id="win-note">
+  <div class="titlebar">
+    <button class="tb-close" onclick="closeWin('win-note')"></button>
+    <span class="tb-title" id="note-win-title">Notepad</span>
+  </div>
+  <div class="win-body note-body">
+    <div id="note-filename-bar">untitled</div>
+    <textarea id="note-area" placeholder="Start typing..."></textarea>
+  </div>
+</div>
+
+<!-- browser html -->
+<div class="window" id="win-browser">
+  <div class="titlebar">
+    <button class="tb-close" onclick="closeWin('win-browser')"></button>
+    <span class="tb-title">Browser</span>
+  </div>
+  <div class="win-body">
+    <div class="browser-body">
+      <div id="browser-search-bar">
+        <input id="browser-input" type="text" placeholder="Search the web or enter URL..." autocomplete="off"/>
+        <button id="browser-go">Go</button>
+      </div>
+      <div id="browser-hint">Type something and press Go.</div>
+      <div id="browser-iframe-wrap">
+        <iframe id="browser-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+      </div>
+    </div>
+  </div>
+  <div class="resize-h" id="browser-resizer"></div>
+</div>
+
+<!-- files -->
+<div class="window" id="win-files">
+  <div class="titlebar">
+    <button class="tb-close" onclick="closeWin('win-files')"></button>
+    <span class="tb-title">File Explorer</span>
+  </div>
+  <div class="win-body">
+    <div class="fe-body">
+      <div class="fe-toolbar">
+        <span class="fe-path">📂 / Home</span>
+      </div>
+      <div class="fe-grid" id="fe-grid">
+        <div class="fe-empty" id="fe-empty">
+          <div class="fe-empty-icon">📭</div>
+          <span>Right-click to create files or folders</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- right click -->
+<div id="ctx-menu">
+  <div class="ctx-item" id="ctx-new-file"><span class="ctx-icon">📄</span> New File</div>
+  <div class="ctx-item" id="ctx-new-folder"><span class="ctx-icon">📁</span> New Folder</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" id="ctx-refresh"><span class="ctx-icon">🔄</span> Refresh</div>
+</div>
+
+<script>
+/*clock mechanism */
+function tick(){
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  const ss=String(now.getSeconds()).padStart(2,'0');
+  const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('screen-time').textContent=hh+' : '+mm;
+  document.getElementById('screen-date-badge').textContent=
+    DAYS[now.getDay()]+'  ·  '+now.getDate()+' '+MON[now.getMonth()]+' '+now.getFullYear();
+  document.getElementById('taskbar-clock').innerHTML=
+    '<span class="badge bg-secondary bg-opacity-75 text-white" style="font-family:Share Tech Mono,monospace;font-size:.7rem;letter-spacing:.05em">'+
+    hh+':'+mm+':'+ss+'&nbsp;&nbsp;'+DAYS[now.getDay()].slice(0,3)+' '+now.getDate()+' '+MON[now.getMonth()]+'</span>';
+}
+tick();setInterval(tick,1000);
+
+/* drag clock */
+(function(){
+  const el=document.getElementById('clock-widget');
+  let d=false,ox=0,oy=0;
+  el.addEventListener('mousedown',e=>{d=true;ox=e.clientX-el.offsetLeft;oy=e.clientY-el.offsetTop;});
+  document.addEventListener('mousemove',e=>{if(d){el.style.left=(e.clientX-ox)+'px';el.style.top=(e.clientY-oy)+'px';}});
+  document.addEventListener('mouseup',()=>d=false);
+})();
+
+/* icon drags */
+document.querySelectorAll('.desk-item').forEach(icon=>{
+  let dragging=false,ox=0,oy=0,moved=false;
+  icon.addEventListener('mousedown',e=>{
+    dragging=true;moved=false;
+    ox=e.clientX-icon.offsetLeft;oy=e.clientY-icon.offsetTop;
+    icon.style.zIndex=70;e.preventDefault();
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const nx=e.clientX-ox,ny=e.clientY-oy;
+    if(Math.abs(nx-icon.offsetLeft)>3||Math.abs(ny-icon.offsetTop)>3)moved=true;
+    icon.style.left=nx+'px';icon.style.top=ny+'px';
+  });
+  document.addEventListener('mouseup',e=>{
+    if(dragging&&moved)e.stopImmediatePropagation();
+    dragging=false;icon.style.zIndex=60;
+  });
+  icon.addEventListener('click',e=>{if(moved){e.stopImmediatePropagation();moved=false;}});
+});
+
+/* ── WINDOW MANAGER ── */
+let zTop=300;
+function openWin(id){
+  const w=document.getElementById(id);
+  w.classList.add('open');w.style.zIndex=++zTop;
+  const chip=document.getElementById('chip-'+id);
+  if(chip)chip.classList.add('open');
+}
+function closeWin(id){
+  document.getElementById(id).classList.remove('open');
+  const chip=document.getElementById('chip-'+id);
+  if(chip)chip.classList.remove('open');
+}
+document.querySelectorAll('.window').forEach(w=>{
+  w.addEventListener('mousedown',()=>w.style.zIndex=++zTop);
+});
+
+/* ── WINDOW DRAG ── */
+document.querySelectorAll('.titlebar').forEach(bar=>{
+  const win=bar.closest('.window');
+  let d=false,ox=0,oy=0;
+  bar.addEventListener('mousedown',e=>{
+    if(e.target.classList.contains('tb-close'))return;
+    d=true;ox=e.clientX-win.offsetLeft;oy=e.clientY-win.offsetTop;
+    win.style.zIndex=++zTop;
+  });
+  document.addEventListener('mousemove',e=>{if(d){win.style.left=(e.clientX-ox)+'px';win.style.top=(e.clientY-oy)+'px';}});
+  document.addEventListener('mouseup',()=>d=false);
+});
+
+/* scratchpad */
+const canvas=document.getElementById('sp-canvas');
+const ctx=canvas.getContext('2d');
+ctx.strokeStyle='black';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';
+let spDrawing=false;
+document.getElementById('sp-dark').addEventListener('click',()=>{ctx.strokeStyle='#0B1957';ctx.lineWidth=3;});
+document.getElementById('sp-blue').addEventListener('click',()=>{ctx.strokeStyle='#5784E6';ctx.lineWidth=3;});
+document.getElementById('sp-pink').addEventListener('click',()=>{ctx.strokeStyle='#FA9EBC';ctx.lineWidth=3;});
+document.getElementById('sp-eraser').addEventListener('click',()=>{ctx.strokeStyle='white';ctx.lineWidth=20;});
+canvas.addEventListener('mousedown',e=>{spDrawing=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
+canvas.addEventListener('mousemove',e=>{if(!spDrawing)return;ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();});
+window.addEventListener('mouseup',()=>spDrawing=false);
+
+/* calculator */
+function calcAdd(v){document.getElementById('calc-screen').value+=v;}
+function calcSolve(){const s=document.getElementById('calc-screen');try{s.value=eval(s.value);}catch{s.value='Error';}}
+function calcClear(){document.getElementById('calc-screen').value='';}
+
+/*calendar*/
+const calNow=new Date();
+let calMonth=calNow.getMonth(),calYear=calNow.getFullYear();
+const CAL_MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function calDraw(){
+  document.getElementById('cal-month').textContent=CAL_MON[calMonth]+' '+calYear;
+  const first=new Date(calYear,calMonth,1).getDay();
+  const total=new Date(calYear,calMonth+1,0).getDate();
+  const prev=new Date(calYear,calMonth,0).getDate();
+  let box='';
+  for(let i=first-1;i>=0;i--)box+=`<div class="cal-cell"><div class="cal-num cal-dim">${prev-i}</div></div>`;
+  for(let i=1;i<=total;i++){
+    let cls='cal-num';
+    if(i==calNow.getDate()&&calMonth==calNow.getMonth()&&calYear==calNow.getFullYear())cls+=' cal-today';
+    box+=`<div class="cal-cell"><div class="${cls}">${i}</div></div>`;
+  }
+  const left=42-(first+total);
+  for(let i=1;i<=left;i++)box+=`<div class="cal-cell"><div class="cal-num cal-dim">${i}</div></div>`;
+  document.getElementById('cal-grid').innerHTML=box;
+}
+function calChange(v){calMonth+=v;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}calDraw();}
+function calToday(){calMonth=calNow.getMonth();calYear=calNow.getFullYear();calDraw();}
+calDraw();
+
+/*browser*/
+(function(){
+  const input=document.getElementById('browser-input');
+  const btn=document.getElementById('browser-go');
+  const wrap=document.getElementById('browser-iframe-wrap');
+  const frame=document.getElementById('browser-iframe');
+  const hint=document.getElementById('browser-hint');
+  const win=document.getElementById('win-browser');
+  const resizer=document.getElementById('browser-resizer');
+  function doSearch(){
+    const q=input.value.trim();if(!q)return;
+    let url;
+    try{const u=new URL(q.includes('://')?q:'https://'+q);url=u.href;}
+    catch{url='https://www.google.com/search?igu=1&q='+encodeURIComponent(q);}
+    frame.src=url;wrap.style.display='block';hint.style.display='none';
+  }
+  btn.addEventListener('click',doSearch);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+  let rz=false,rx=0,ry=0,rw=0,rh=0;
+  resizer.addEventListener('mousedown',e=>{
+    e.stopPropagation();rz=true;rx=e.clientX;ry=e.clientY;
+    rw=win.offsetWidth;rh=win.offsetHeight;
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!rz)return;
+    win.style.width=Math.max(400,rw+e.clientX-rx)+'px';
+    win.style.height=Math.max(300,rh+e.clientY-ry)+'px';
+  });
+  document.addEventListener('mouseup',()=>rz=false);
+})();
+
+/*FILE EXPLORER */
+(function(){
+  const feGrid=document.getElementById('fe-grid');
+  const feEmptyEl=document.getElementById('fe-empty');
+  const ctxMenu=document.getElementById('ctx-menu');
+  const winFiles=document.getElementById('win-files');
+  let items=[];
+
+  function renderGrid(){
+    feGrid.innerHTML='';
+    if(items.length===0){
+      feGrid.appendChild(feEmptyEl);
+      return;
+    }
+    items.forEach((item,idx)=>{
+      const el=document.createElement('div');
+      el.className='fe-item';
+      el.dataset.idx=idx;
+
+      const icon=document.createElement('div');
+      icon.className='fe-item-icon';
+      icon.textContent=item.type==='folder'?'📁':'📄';
+
+      const label=document.createElement('div');
+      label.className='fe-item-name';
+      label.textContent=item.name;
+
+      el.appendChild(icon);
+      el.appendChild(label);
+
+      /* double-click file → open in notepad */
+      el.addEventListener('dblclick',()=>{
+        if(item.type==='file') openInNotepad(item.name);
+      });
+
+      feGrid.appendChild(el);
+    });
+  }
+
+  function openInNotepad(filename){
+    document.getElementById('note-filename-bar').textContent=filename;
+    document.getElementById('note-win-title').textContent='Notepad — '+filename;
+    document.getElementById('note-area').placeholder='Editing '+filename+'…';
+    openWin('win-note');
+  }
+
+  function addItem(type){
+    const defaultName=type==='folder'?'New Folder':'New File.txt';
+    items.push({type,name:defaultName});
+    renderGrid();
+    startRename(items.length-1);
+  }
+
+  function startRename(idx){
+    const els=feGrid.querySelectorAll('.fe-item');
+    const el=els[idx];
+    if(!el)return;
+    const label=el.querySelector('.fe-item-name');
+
+    const inp=document.createElement('input');
+    inp.className='fe-rename';
+    inp.value=items[idx].name;
+    label.replaceWith(inp);
+    inp.focus();inp.select();
+
+    function commit(){
+      const val=inp.value.trim()||items[idx].name;
+      items[idx].name=val;
+      renderGrid();
+      if(items[idx].type==='file') openInNotepad(val);
+    }
+    inp.addEventListener('blur',commit);
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter')inp.blur();
+      if(e.key==='Escape'){items[idx].name=items[idx].name;inp.blur();}
+      e.stopPropagation();
+    });
+  }
+
+  /* right-click ONLY inside the file explorer window (not titlebar) */
+  winFiles.addEventListener('contextmenu',e=>{
+    if(e.target.closest('.titlebar'))return;
+    e.preventDefault();
+    /* clamp so menu stays on screen */
+    const mw=180,mh=110;
+    const x=Math.min(e.clientX, window.innerWidth-mw);
+    const y=Math.min(e.clientY, window.innerHeight-mh);
+    ctxMenu.style.left=x+'px';
+    ctxMenu.style.top=y+'px';
+    ctxMenu.classList.add('open');
+  });
+
+  /* prevent browser context menu everywhere else in the OS */
+  document.addEventListener('contextmenu',e=>{
+    if(!winFiles.contains(e.target))e.preventDefault();
+  });
+
+  document.addEventListener('mousedown',e=>{
+    if(!ctxMenu.contains(e.target))ctxMenu.classList.remove('open');
+  });
+
+  document.getElementById('ctx-new-file').addEventListener('click',()=>{
+    ctxMenu.classList.remove('open');addItem('file');
+  });
+  document.getElementById('ctx-new-folder').addEventListener('click',()=>{
+    ctxMenu.classList.remove('open');addItem('folder');
+  });
+  document.getElementById('ctx-refresh').addEventListener('click',()=>{
+    ctxMenu.classList.remove('open');renderGrid();
+  });
+
+  renderGrid();
+})();
+</script>
+</body>
+</html>
